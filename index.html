@@ -146,6 +146,12 @@
     background: #fff; color: #000; font: 12px/1.35 var(--ui); user-select: text; -webkit-user-select: text;
   }
   .log:focus-visible { outline: 1px solid var(--accent); border-color: var(--accent); }
+  /* Parchment log panels: the transparent border keeps the text and scrollbar inside the panel's frame. */
+  :root:not([data-simple]) .log {
+    border: 12px solid transparent; padding: 0 2px; scrollbar-width: thin; scrollbar-color: #6b4c2e transparent;
+    background: url("images/ui/logpanel.webp") 0 0 / 100% 100% no-repeat border-box;
+  }
+  :root:not([data-simple]) .log:focus-visible { border-color: transparent; outline-color: #5a3d22; }
 
   /* Positions in the 534x511 client area, as on the desktop app */
   #optionsSmall { z-index: 4; left: 499px; top: 0; width: 25px; height: 25px; }
@@ -219,6 +225,15 @@
     color-scheme: light; font: 12px/1.4 var(--ui); box-shadow: 0 12px 36px rgba(0, 0, 0, .35);
   }
   dialog.win::backdrop { background: rgba(0, 0, 0, .15); }
+  /* Parchment options panel. The padding keeps the content inside the panel's frame, and a drop shadow
+     follows the panel's transparent corners where a box shadow wouldn't. */
+  :root:not([data-simple]) #dlgOptions {
+    padding: 13px; border: 0; box-shadow: none; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .35));
+    background: url("images/ui/options_panel.webp") center / 100% 100% no-repeat;
+  }
+  :root:not([data-simple]) #dlgOptions .dlg-title { background: none; }
+  :root:not([data-simple]) #dlgOptions .group { border-color: rgba(60, 40, 20, .35); }
+  :root:not([data-simple]) #dlgOptions .hint { color: #3d2c1c; }
   .dlg-title { display: flex; align-items: center; justify-content: space-between; height: 30px; padding-left: 10px; background: #fff; user-select: none; -webkit-user-select: none; }
   .dlg-title h2 { margin: 0; font: inherit; }
   .dlg-x { width: 46px; height: 30px; border: 0; background: none; font: 13px var(--ui); color: #000; cursor: pointer; }
@@ -1952,8 +1967,8 @@ class MersenneTwister {
 
   $("aboutVersion").textContent = "v" + VERSION;
   buildPoolControls();
-  // Load the hover and pressed images up front, so the first hover or press doesn't flicker.
-  if (!SIMPLE) for (const t of ["tab1_hover", "tab2_hover", "button_pressed"]) new Image().src = `images/ui/${t}.webp`;
+  // Load the images first shown on a hover, press, tab switch or dialog up front, so they don't flicker in.
+  if (!SIMPLE) for (const t of ["tab1_hover", "tab2_hover", "button_pressed", "logpanel", "options_panel"]) new Image().src = `images/ui/${t}.webp`;
   bind();
 
   if (settings.newRoundOnVisit) closeRound();
