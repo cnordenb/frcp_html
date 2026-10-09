@@ -729,12 +729,15 @@ class MersenneTwister {
 
   // ---- Settings and saved state ----
 
+  // A freshness setting at or above half the pool means "the most", so it follows the pool's size.
+  const FRESH_MOST = 1000;
+
   const DEFAULT_SETTINGS = {
     v: 1,
     showName: true, showIcon: true, showCounter: true, tooltips: true,
-    jingles: true, legacyJingles: false, uiSounds: true,
-    drawOnLoad: true, newRoundOnVisit: false,
-    fresh: false, freshN: 1,
+    jingles: true, legacyJingles: true, uiSounds: true,
+    drawOnLoad: false, newRoundOnVisit: false,
+    fresh: true, freshN: FRESH_MOST,
     showRemaining: true, autoReset: false, autoToggle: false,
     hotkeys: "browser",
   };
@@ -860,6 +863,7 @@ class MersenneTwister {
     return a;
   }
   function stopSound() {
+    if (hoverAudio) hoverAudio.pause();
     if (!playing) return;
     playing.pause();
     try { playing.currentTime = 0; } catch { /* not loaded yet */ }
@@ -879,6 +883,29 @@ class MersenneTwister {
   function sfx(name) {
     if (settings.uiSounds) playUrl(uiUrl(name));
   }
+  // The hover sound has a channel of its own, so moving the mouse doesn't cut off a jingle.
+  let hoverAudio = null;
+  function hoverChannel() {
+    if (!hoverAudio) {
+      hoverAudio = new Audio(uiUrl("hover"));
+      hoverAudio.preload = "auto";
+    }
+    return hoverAudio;
+  }
+  function hoverSound() {
+    if (!settings.uiSounds) return;
+    const a = hoverChannel();
+    try { a.currentTime = 0; } catch { /* not loaded yet */ }
+    const p = a.play();
+    if (p) p.catch(() => {});
+  }
+  // Plays the hover sound whenever the mouse cursor turns into the pointing hand.
+  let handCursor = false;
+  function onPointerOver(e) {
+    const hand = e.target instanceof Element && getComputedStyle(e.target).cursor === "pointer";
+    if (hand && !handCursor) hoverSound();
+    handCursor = hand;
+  }
   function jingleUrl(id) {
     const legacy = settings.legacyJingles;
     if (id == null) return legacy ? "sounds/civ/legacy/random.webm" : "sounds/civ/random.webm";
@@ -894,6 +921,7 @@ class MersenneTwister {
     if (warmed) return;
     warmed = true;
     for (const name of Object.keys(UI_SOUNDS)) audioFor(uiUrl(name));
+    hoverChannel();
     setTimeout(() => {
       if (!settings.jingles) return;
       audioFor(jingleUrl(null));
@@ -1485,7 +1513,8 @@ class MersenneTwister {
   function updateFreshLabel() {
     const n = poolIds().length;
     const v = Number(optForm.elements.freshN.value);
-    $("freshLabel").textContent = n < 2 ? "Needs at least 2 civs in the pool" : `Exclude the last ${v} civ${v === 1 ? "" : "s"}`;
+    $("freshLabel").textContent = n < 2 ? "Needs at least 2 civs in the pool"
+      : `Exclude the last ${v} civ${v === 1 ? "" : "s"}${v === freshMax(n) ? " (the most)" : ""}`;
   }
   function openOptions() {
     sfx("button");
@@ -1796,11 +1825,12 @@ class MersenneTwister {
       }
     });
     optForm.elements.freshN.addEventListener("input", () => {
-      settings.freshN = Number(optForm.elements.freshN.value);
+      const slider = optForm.elements.freshN;
+      settings.freshN = Number(slider.value) >= Number(slider.max) ? FRESH_MOST : Number(slider.value);
       saveSettings();
       updateFreshLabel();
     });
-    for (const s of optForm.querySelectorAll("select")) s.addEventListener("mousedown", () => sfx("hover"));
+    for (const s of optForm.querySelectorAll("select")) s.addEventListener("mousedown", hoverSound);
 
     $("lobbyForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -1843,6 +1873,8 @@ class MersenneTwister {
       }
     });
     document.addEventListener("pointermove", moveTip);
+    document.addEventListener("pointerover", onPointerOver);
+    document.documentElement.addEventListener("mouseleave", () => { handCursor = false; });
     document.documentElement.addEventListener("mouseleave", hideTip);
     document.addEventListener("pointerdown", warmUp, { capture: true, once: true });
     document.addEventListener("keydown", warmUp, { capture: true, once: true });
