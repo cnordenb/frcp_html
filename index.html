@@ -27,11 +27,13 @@
       --frame: #4b5560;
     }
   }
+  /* Parchment theme: Georgia for all text except the blackletter buttons. */
+  :root:not([data-simple]) { --ui: Georgia, "Times New Roman", serif; }
   *, *::before, *::after { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html { background: var(--page); }
   body {
-    margin: 0; min-height: 100vh; min-width: 568px; padding: 16px;
+    margin: 0; min-height: 100vh; min-width: 610px; padding: 16px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     background: var(--page); color: var(--page-ink); font: 12px/1.35 var(--ui);
   }
@@ -49,6 +51,13 @@
     box-shadow: 0 10px 32px rgba(0, 0, 0, .22), 0 2px 6px rgba(0, 0, 0, .12);
     user-select: none; -webkit-user-select: none;
   }
+  /* The parchment covers the whole window. The padding keeps the content inside its burnt edge,
+     and the parchment's own shadow replaces the window border and shadow. */
+  :root:not([data-simple]) .window {
+    width: 578px; padding: 22px; border: 0; box-shadow: none;
+    background: url("images/ui/background.webp") center / 100% 100% no-repeat;
+  }
+  :root:not([data-simple]) .client { background: transparent; }
   .titlebar { margin: 0; height: 30px; display: flex; align-items: center; padding: 0 10px; font: 12px var(--ui); }
 
   .menubar { position: relative; z-index: 20; display: flex; height: 20px; }
@@ -76,6 +85,8 @@
 
   .client { position: relative; width: 534px; height: 511px; background: #fff; overflow: hidden; }
   .frame { position: absolute; left: 0; right: 0; top: 21px; bottom: 0; border: 1px solid var(--line); }
+  /* Images set in CSS are scoped to :not([data-simple]), so simple mode never loads them. */
+  :root:not([data-simple]) .frame { border-color: rgba(90, 60, 30, .35); }
   .tabstrip { position: absolute; z-index: 3; left: 2px; top: 0; display: flex; }
   .tab {
     position: relative; top: 2px; height: 19px; margin-right: -1px; padding: 0 6px;
@@ -85,6 +96,16 @@
   .tab:hover { background: #d8eaf9; }
   .tab[aria-selected="true"] { z-index: 1; top: 0; height: 22px; padding: 0 8px; background: #fff; }
   .tab:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  /* Parchment tabs: Draw Civ and Civ Pool use tab1, Log uses tab2. There's no selected image,
+     so the selected tab is bold at full brightness and the others are dimmed. */
+  :root:not([data-simple]) .tab {
+    top: 0; width: 70px; height: 25px; margin-right: -2px; padding: 0 0 3px; border: 0;
+    background: url("images/ui/tab1_normal.webp") center / 100% 100% no-repeat; filter: brightness(.88);
+  }
+  :root:not([data-simple]) #tab-1 { background-image: url("images/ui/tab2_normal.webp"); }
+  :root:not([data-simple]) .tab:hover { background-image: url("images/ui/tab1_hover.webp"); }
+  :root:not([data-simple]) #tab-1:hover { background-image: url("images/ui/tab2_hover.webp"); }
+  :root:not([data-simple]) .tab[aria-selected="true"] { z-index: 1; filter: none; font-weight: 600; }
   .panel { position: absolute; z-index: 1; inset: 0; }
 
   /* Each control lists the tabs it shows on, e.g. data-on="0 1". */
@@ -99,6 +120,15 @@
   .btn:hover { background: #e5f1fb; border-color: var(--accent); }
   .btn:active { background: #cce4f7; border-color: #005499; }
   .btn:focus-visible { outline: 1px dotted #000; outline-offset: -4px; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  /* Parchment text buttons: wooden button images with a blackletter face. There's no hover image,
+     so hover brightens the text instead. */
+  :root:not([data-simple]) .btn {
+    border: 0; background: url("images/ui/button.webp") center / 100% 100% no-repeat;
+    font: 14px "Lucida Blackletter", "Old English Text MT", serif; color: #f1deae;
+  }
+  :root:not([data-simple]) .btn:hover { color: #fff8e0; }
+  :root:not([data-simple]) .btn:active { background-image: url("images/ui/button_pressed.webp"); }
+  :root:not([data-simple]) .btn:focus-visible { outline-color: #f1deae; box-shadow: none; }
   .imgbtn { position: absolute; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; }
   .imgbtn img { display: block; width: 100%; height: 100%; }
   .imgbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -128,7 +158,7 @@
   #resetBtn { left: 10px; top: 471px; width: 100px; height: 30px; }
   .client[data-tab="1"] #resetBtn { left: 217px; }
   #techBtn { left: 384px; top: 391px; width: 60px; height: 60px; }
-  #roundCounter { left: 464px; top: 491px; width: 60px; text-align: right; }
+  #roundCounter { left: 456px; top: 484px; width: 60px; text-align: right; }
   #drawnCount { left: 10px; top: 32px; }
   #clearLogBtn { left: 110px; top: 25px; width: 100px; height: 30px; }
   #drawnLog { left: 10px; top: 60px; width: 198px; height: 441px; }
@@ -1922,6 +1952,8 @@ class MersenneTwister {
 
   $("aboutVersion").textContent = "v" + VERSION;
   buildPoolControls();
+  // Load the hover and pressed images up front, so the first hover or press doesn't flicker.
+  if (!SIMPLE) for (const t of ["tab1_hover", "tab2_hover", "button_pressed"]) new Image().src = `images/ui/${t}.webp`;
   bind();
 
   if (settings.newRoundOnVisit) closeRound();
