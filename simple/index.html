@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Random Civ Picker</title>
+</head>
+<body>
+<noscript>Fresh Random Civ Picker needs JavaScript.</noscript>
+<script>
+  // Loads the main page without images or sounds: image paths are blanked before the page
+  // is written, and data-simple tells its script not to load any.
+  fetch("../index.html")
+    .then((r) => r.text())
+    .then((html) => {
+      html = html
+        .replace('<html lang="en">', '<html lang="en" data-simple>')
+        .replace("<head>", '<head><base href="../">')
+        .replace(/ src="images\//g, ' data-src="images/');
+      document.open();
+      document.write(html);
+      document.close();
+    });
+</script>
+</body>
+</html>

@@ -149,6 +149,23 @@
   #disableAllBtn { left: 125px; top: 470px; width: 100px; height: 30px; }
   #autoResetLabel { left: 310px; top: 480px; height: 20px; }
 
+  /* Simple mode (/simple): no images or sounds, so image buttons become text buttons. */
+  [data-simple] .imgbtn img, [data-simple] .chk img, [data-simple] #civIcon, [data-simple] #editionIcon,
+  [data-simple] #soundGroup { display: none !important; }
+  [data-simple] #optionsBig, [data-simple] #techBtn, [data-simple] #optionsSmall {
+    height: 30px; background: #e1e1e1; border: 1px solid #adadad; font: inherit; color: #000;
+  }
+  [data-simple] #optionsBig:hover, [data-simple] #techBtn:hover, [data-simple] #optionsSmall:hover { background: #e5f1fb; border-color: var(--accent); }
+  [data-simple] #optionsBig:active, [data-simple] #techBtn:active, [data-simple] #optionsSmall:active { background: #cce4f7; border-color: #005499; }
+  [data-simple] #optionsBig { top: 60px; }
+  [data-simple] #optionsBig::after { content: "Options"; }
+  [data-simple] #techBtn { left: 374px; top: 406px; width: 80px; }
+  [data-simple] #techBtn::after { content: "Tech Tree"; }
+  [data-simple] #optionsSmall { width: 25px; height: 21px; padding: 0; }
+  [data-simple] #optionsSmall::after { content: "⚙"; }
+  [data-simple] .ed-icon { width: 13px; height: 13px; margin: 0 4px 0 2px; border: 1px solid #333; border-radius: 50%; background: #fff; }
+  [data-simple] .edition[aria-pressed="true"] .ed-icon { background: radial-gradient(#000 0 3px, #fff 3.5px); }
+
   #toast {
     position: absolute; z-index: 5; left: 50%; bottom: 44px; transform: translateX(-50%);
     padding: 5px 12px; border-radius: 3px; background: #2b2b2b; color: #fff; white-space: nowrap;
@@ -368,7 +385,7 @@
         <label class="row"><input type="checkbox" name="showCounter">Show round counter</label>
         <label class="row"><input type="checkbox" name="tooltips">Enable tooltips</label>
       </fieldset>
-      <fieldset class="group"><legend>Sound</legend>
+      <fieldset class="group" id="soundGroup"><legend>Sound</legend>
         <label class="row"><input type="checkbox" name="jingles">Enable civ jingles</label>
         <label class="row">Jingle type
           <select name="jingleType"><option value="de">Definitive Edition</option><option value="legacy">Legacy</option></select></label>
@@ -610,6 +627,8 @@ class MersenneTwister {
   if (matchMedia("(pointer: coarse)").matches) return;
 
   const VERSION = "1.0.0";
+  // simple/index.html loads this page with data-simple set: no images, no sounds.
+  const SIMPLE = document.documentElement.hasAttribute("data-simple");
 
   // ---- Data ----
 
@@ -872,6 +891,7 @@ class MersenneTwister {
   // One sound at a time, as on the desktop app: a new sound cuts off the one playing.
   // Browsers block sound until the first click or key press, so early calls fail quietly.
   function playUrl(url) {
+    if (SIMPLE) return;
     stopSound();
     const a = audioFor(url);
     playing = a;
@@ -893,6 +913,7 @@ class MersenneTwister {
     return hoverAudio;
   }
   function hoverSound() {
+    if (SIMPLE) return;
     if (!settings.uiSounds) return;
     const a = hoverChannel();
     try { a.currentTime = 0; } catch { /* not loaded yet */ }
@@ -920,6 +941,7 @@ class MersenneTwister {
   function warmUp() {
     if (warmed) return;
     warmed = true;
+    if (SIMPLE) return;
     for (const name of Object.keys(UI_SOUNDS)) audioFor(uiUrl(name));
     hoverChannel();
     setTimeout(() => {
@@ -1326,6 +1348,7 @@ class MersenneTwister {
     return el;
   }
   function setSrc(img, src) {
+    if (SIMPLE) return;
     if (img.getAttribute("src") !== src) img.src = src;
   }
   function setText(el, text) {
@@ -1374,7 +1397,7 @@ class MersenneTwister {
       DLC_TOGGLES[ed].forEach((dlc, i) => {
         const input = h("input", { type: "checkbox" });
         input.addEventListener("change", () => toggleDlc(dlc));
-        const img = h("img", { src: `images/dlc/${DLCS[dlc].icon}.webp`, alt: "", width: L.size, height: L.size, decoding: "async" });
+        const img = SIMPLE ? "" : h("img", { src: `images/dlc/${DLCS[dlc].icon}.webp`, alt: "", width: L.size, height: L.size, decoding: "async" });
         const label = h("label", { className: "chk", dataset: { tip: dlcTip(dlc, i) } }, img, input, DLCS[dlc].name);
         Object.assign(label.style, { left: L.left + "px", top: L.top(i) + "px", height: L.size + "px", gap: L.gap + "px" });
         group.append(label);
