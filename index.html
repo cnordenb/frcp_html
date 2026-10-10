@@ -88,6 +88,14 @@
   :root:not([data-simple]) .menu-list > button:hover, :root:not([data-simple]) .menu-list > a:hover,
   :root:not([data-simple]) .menu-list > button:focus-visible, :root:not([data-simple]) .menu-list > a:focus-visible { background: #dccb70; color: #000; }
   :root:not([data-simple]) .menu-list hr { border-top-color: rgba(241, 222, 174, .3); }
+  /* Items that open another site get the external icon in their left margin. It's drawn in the menu
+     text's colour, so it turns black with the text on the hovered item. */
+  :root:not([data-simple]) :is(.menu-list > a, #menu-civs > [data-act="techtree"]) { position: relative; }
+  :root:not([data-simple]) :is(.menu-list > a, #menu-civs > [data-act="techtree"])::before {
+    content: ""; position: absolute; left: 9px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+    background: url("images/ui/external.webp") center / contain no-repeat;
+  }
+  :root:not([data-simple]) :is(.menu-list > a, #menu-civs > [data-act="techtree"]):is(:hover, :focus-visible)::before { filter: brightness(0); }
 
   .client { position: relative; width: 534px; height: 511px; background: #fff; overflow: hidden; }
   .frame { position: absolute; left: 0; right: 0; top: 21px; bottom: 0; border: 1px solid var(--line); }
@@ -249,23 +257,25 @@
     color-scheme: light; font: 12px/1.4 var(--ui); box-shadow: 0 12px 36px rgba(0, 0, 0, .35);
   }
   dialog.win::backdrop { background: rgba(0, 0, 0, .15); }
-  /* Parchment panels for the options, hotkeys, about and link dialogs. The padding keeps the content inside the panel's
-     frame, and a drop shadow follows the panel's transparent corners where a box shadow wouldn't. */
-  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare, #dlgOpen) {
+  /* Parchment panels for the options, hotkeys, about, lobby and link dialogs. The padding keeps the content
+     inside the panel's frame, and a drop shadow follows the panel's transparent corners where a box shadow
+     wouldn't. */
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgLobby, #dlgShare, #dlgOpen) {
     padding: 13px; border: 0; box-shadow: none; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .35));
     background: center / 100% 100% no-repeat;
   }
   :root:not([data-simple]) #dlgOptions { background-image: url("images/ui/options_panel.webp"); }
   :root:not([data-simple]) #dlgHotkeys { background-image: url("images/ui/hotkeys_panel.webp"); }
   :root:not([data-simple]) #dlgAbout { background-image: url("images/ui/about_panel.webp"); }
+  :root:not([data-simple]) #dlgLobby { background-image: url("images/ui/joinlobby_panel.webp"); }
   :root:not([data-simple]) #dlgShare { background-image: url("images/ui/share_panel.webp"); }
   :root:not([data-simple]) #dlgOpen { background-image: url("images/ui/open_link_panel.webp"); }
-  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare, #dlgOpen) .dlg-title { background: none; }
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgLobby, #dlgShare, #dlgOpen) .dlg-title { background: none; }
   :root:not([data-simple]) #dlgOptions .group { border-color: rgba(60, 40, 20, .35); }
   /* Hint, link and error colours dark enough to read on the panel's tan */
-  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare) .hint { color: #3d2c1c; }
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgLobby, #dlgShare) .hint { color: #3d2c1c; }
   :root:not([data-simple]) #dlgAbout a { color: #08306a; }
-  :root:not([data-simple]) #dlgOpen .err { color: #680a0a; }
+  :root:not([data-simple]) :is(#dlgLobby, #dlgOpen) .err { color: #680a0a; }
   .dlg-title { display: flex; align-items: center; justify-content: space-between; height: 30px; padding-left: 10px; background: #fff; user-select: none; -webkit-user-select: none; }
   .dlg-title h2 { margin: 0; font: inherit; }
   .dlg-x { width: 46px; height: 30px; border: 0; background: none; font: 13px var(--ui); color: #000; cursor: pointer; }
@@ -356,19 +366,19 @@
         <button type="button" class="menu-title" aria-expanded="false" aria-controls="menu-file">File</button>
         <div class="menu-list" id="menu-file" role="menu" hidden>
           <button type="button" role="menuitem" data-act="copyLink"><span>Copy Share Link</span><kbd data-key="copyLink"></kbd></button>
-          <button type="button" role="menuitem" data-act="share"><span>Share...</span><kbd></kbd></button>
-          <button type="button" role="menuitem" data-act="openLink"><span>Open Link...</span><kbd data-key="openLink"></kbd></button>
+          <button type="button" role="menuitem" data-act="share"><span>Share ...</span><kbd></kbd></button>
+          <button type="button" role="menuitem" data-act="openLink"><span>Open Link ...</span><kbd data-key="openLink"></kbd></button>
           <hr>
           <button type="button" role="menuitem" data-act="quicksave"><span>Quicksave</span><kbd data-key="quicksave"></kbd></button>
           <button type="button" role="menuitem" data-act="quickload"><span>Quickload</span><kbd data-key="quickload"></kbd></button>
           <hr>
-          <button type="button" role="menuitem" data-act="options"><span>Options</span><kbd data-key="options"></kbd></button>
+          <button type="button" role="menuitem" data-act="options"><span>Options ...</span><kbd data-key="options"></kbd></button>
         </div>
       </div>
       <div class="menu">
         <button type="button" class="menu-title" aria-expanded="false" aria-controls="menu-lobbies">Lobbies</button>
         <div class="menu-list" id="menu-lobbies" role="menu" hidden>
-          <button type="button" role="menuitem" data-act="lobby"><span>Join Lobby</span><kbd data-key="lobby"></kbd></button>
+          <button type="button" role="menuitem" data-act="lobby"><span>Join Lobby ...</span><kbd data-key="lobby"></kbd></button>
           <a role="menuitem" href="https://www.aoe2insights.com/lobbies/" target="_blank" rel="noopener"><span>AoE2 Insights ...</span><kbd></kbd></a>
           <a role="menuitem" href="https://aoe2recs.com/" target="_blank" rel="noopener"><span>Spectator Dashboard ...</span><kbd></kbd></a>
         </div>
@@ -401,9 +411,9 @@
       <div class="menu">
         <button type="button" class="menu-title" aria-expanded="false" aria-controls="menu-help">Help</button>
         <div class="menu-list" id="menu-help" role="menu" hidden>
-          <button type="button" role="menuitem" data-act="hotkeys"><span>Hotkeys</span><kbd data-key="hotkeys"></kbd></button>
+          <button type="button" role="menuitem" data-act="hotkeys"><span>Hotkeys ...</span><kbd data-key="hotkeys"></kbd></button>
           <a role="menuitem" href="https://ko-fi.com/hjoerleif" target="_blank" rel="noopener"><span>Donate ...</span><kbd></kbd></a>
-          <button type="button" role="menuitem" data-act="about"><span>About</span><kbd data-key="about"></kbd></button>
+          <button type="button" role="menuitem" data-act="about"><span>About ...</span><kbd data-key="about"></kbd></button>
         </div>
       </div>
     </nav>
@@ -504,7 +514,7 @@
         <div class="inline">
           <label class="row">Mode
             <select name="hotkeys"><option value="desktop">Desktop</option><option value="browser">Browser-friendly</option></select></label>
-          <button type="button" class="btn" data-act="hotkeys">Show hotkeys</button>
+          <button type="button" class="btn" data-act="hotkeys">Show Hotkeys</button>
         </div>
         <p class="hint" id="modeHint"></p>
       </fieldset>
@@ -2029,9 +2039,10 @@ class MersenneTwister {
   buildPoolControls();
   // Load the images first shown on a hover, press, tab switch or dialog up front, so they don't flicker in.
   if (!SIMPLE) {
-    const early = ["tab1_hover", "tab2_hover", "button_pressed", "logpanel", "options_panel", "hotkeys_panel", "about_panel", "share_panel",
-      "open_link_panel", "checkbox_unticked", "checkbox_ticked", "checkbox_unticked_pressed", "checkbox_ticked_pressed", "dropdownbutton", "dropdownbutton_pressed",
-      "xbutton", "xbutton_pressed"];
+    const early = ["tab1_hover", "tab2_hover", "button_pressed", "logpanel",
+      "options_panel", "hotkeys_panel", "about_panel", "joinlobby_panel", "share_panel", "open_link_panel",
+      "checkbox_unticked", "checkbox_ticked", "checkbox_unticked_pressed", "checkbox_ticked_pressed",
+      "dropdownbutton", "dropdownbutton_pressed", "xbutton", "xbutton_pressed", "external"];
     for (const t of early) new Image().src = `images/ui/${t}.webp`;
   }
   bind();
