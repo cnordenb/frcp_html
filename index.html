@@ -976,7 +976,9 @@ class MersenneTwister {
 
   // ---- Sound ----
 
-  const UI_SOUNDS = { button: "button_sound", tab: "tab_sound", hover: "hover_sound", error: "error_sound", view: "view_sound", mute: "mute" };
+  const UI_SOUNDS = {
+    button: "button_sound", tab: "parchment_sound", click: "click_sound", hover: "hover_sound", error: "error_sound", view: "view_sound", mute: "mute",
+  };
   const audioCache = new Map();
   let playing = null;
 
@@ -1202,7 +1204,7 @@ class MersenneTwister {
   const olderIds = (ed) => CIVS.filter((c) => OLDER_DLCS[ed].includes(c.dlc)).map((c) => c.id);
 
   function toggleCiv(id) {
-    sfx("button");
+    sfx("click");
     changePool(() => setOn([id], !isOn(id)));
   }
   function toggleDlc(dlc) {
