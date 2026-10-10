@@ -194,6 +194,8 @@
   #resetBtn { left: 10px; top: 471px; width: 100px; height: 30px; }
   .client[data-tab="1"] #resetBtn { left: 217px; }
   #techBtn { left: 384px; top: 391px; width: 60px; height: 60px; }
+  /* The share button sits midway between Draw and Reset on the Log tab. */
+  #shareBtn { left: 249px; top: 385px; width: 37px; height: 37px; }
   #roundCounter { left: 456px; top: 484px; width: 60px; text-align: right; }
   #drawnCount { left: 10px; top: 32px; }
   #clearLogBtn { left: 110px; top: 25px; width: 100px; height: 30px; }
@@ -229,25 +231,34 @@
   .icon-chk input:not(:checked) ~ .chk-name { font-style: italic; text-decoration: line-through; text-decoration-thickness: 2px; }
   #enableAllBtn { left: 10px; top: 470px; width: 100px; height: 30px; }
   #disableAllBtn { left: 125px; top: 470px; width: 100px; height: 30px; }
-  #autoResetLabel { left: 310px; top: 480px; height: 20px; }
+  #autoResetLabel { left: 240px; top: 480px; height: 20px; }
+  #poolShareBtn { left: 487px; top: 466px; width: 37px; height: 37px; }
+  /* A hovered civ is highlighted gold while on and red while off. */
+  :root:not([data-simple]) .civ:hover { background: #dccb70; }
+  :root:not([data-simple]) .civ:hover:has(input:not(:checked)) { background: #dc6a5c; }
 
   /* Simple mode (/simple): no images or sounds, so image buttons become text buttons. */
   [data-simple] .imgbtn img, [data-simple] .chk img, [data-simple] #civIcon, [data-simple] #editionIcon,
   [data-simple] #soundGroup { display: none !important; }
-  [data-simple] #optionsBig, [data-simple] #techBtn {
+  [data-simple] #optionsBig, [data-simple] #techBtn, [data-simple] #shareBtn, [data-simple] #poolShareBtn {
     height: 30px; background: #e1e1e1; border: 1px solid #adadad; font: inherit; color: #000;
   }
-  [data-simple] #optionsBig:hover, [data-simple] #techBtn:hover { background: #e5f1fb; border-color: var(--accent); }
-  [data-simple] #optionsBig:active, [data-simple] #techBtn:active { background: #cce4f7; border-color: #005499; }
+  [data-simple] #optionsBig:hover, [data-simple] #techBtn:hover, [data-simple] #shareBtn:hover, [data-simple] #poolShareBtn:hover { background: #e5f1fb; border-color: var(--accent); }
+  [data-simple] #optionsBig:active, [data-simple] #techBtn:active, [data-simple] #shareBtn:active, [data-simple] #poolShareBtn:active { background: #cce4f7; border-color: #005499; }
   [data-simple] #optionsBig { top: 60px; }
   [data-simple] #optionsBig::after { content: "Options"; }
   [data-simple] #techBtn { left: 374px; top: 406px; width: 80px; }
   [data-simple] #techBtn::after { content: "Tech Tree"; }
+  [data-simple] #shareBtn { left: 217px; top: 388px; width: 100px; }
+  [data-simple] #shareBtn::after, [data-simple] #poolShareBtn::after { content: "Share"; }
+  [data-simple] #poolShareBtn { left: 424px; top: 470px; width: 100px; }
   [data-simple] .ed-icon { width: 13px; height: 13px; margin: 0 4px 0 2px; border: 1px solid #333; border-radius: 50%; background: #fff; }
   [data-simple] .edition[aria-pressed="true"] .ed-icon { background: radial-gradient(#000 0 3px, #fff 3.5px); }
 
+  /* Status messages show just below the window, without moving it. */
+  #app { position: relative; }
   #toast {
-    position: absolute; z-index: 5; left: 50%; bottom: 44px; transform: translateX(-50%);
+    position: absolute; z-index: 5; top: 100%; left: 50%; margin-top: 14px; transform: translateX(-50%);
     padding: 5px 12px; border-radius: 3px; background: #2b2b2b; color: #fff; white-space: nowrap;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .3); pointer-events: none; opacity: 0; transition: opacity .15s;
   }
@@ -502,6 +513,10 @@
         <p class="label" id="remainingCount" data-on="1"></p>
         <label class="chk" id="showRemainingLabel" data-on="1"><input type="checkbox" id="showRemaining">Show</label>
         <textarea class="log" id="remainingLog" data-on="1" readonly aria-label="Civs left to draw this round"></textarea>
+        <button type="button" class="imgbtn stateful" id="shareBtn" data-on="1" aria-label="Copy share link">
+          <img class="s-normal" src="images/ui/sharebutton.webp" alt="" width="37" height="37">
+          <img class="s-pressed" src="images/ui/sharebutton_pressed.webp" alt="" width="37" height="37">
+        </button>
 
         <!-- Civ Pool tab (the DLC toggles are added by the script) -->
         <div role="group" aria-label="Edition" data-on="2">
@@ -524,11 +539,14 @@
         <button type="button" class="btn" id="enableAllBtn" data-on="2">Enable All</button>
         <button type="button" class="btn" id="disableAllBtn" data-on="2">Disable All</button>
         <label class="chk" id="autoResetLabel" data-on="2"><input type="checkbox" id="autoReset">Auto-reset upon change</label>
+        <button type="button" class="imgbtn stateful" id="poolShareBtn" data-on="2" aria-label="Copy share link for the civ pool">
+          <img class="s-normal" src="images/ui/sharebutton.webp" alt="" width="37" height="37">
+          <img class="s-pressed" src="images/ui/sharebutton_pressed.webp" alt="" width="37" height="37">
+        </button>
       </div>
-
-      <div id="toast" role="status" aria-live="polite"></div>
     </div>
   </div>
+  <div id="toast" role="status" aria-live="polite"></div>
 </main>
 
 <div id="tip" role="tooltip" hidden></div>
@@ -1435,10 +1453,11 @@ class MersenneTwister {
     return ok;
   }
 
-  async function copyShareLink() {
+  // Copies a share link with the pool, and with this round's draws unless withDraws is false
+  async function copyShareLink(withDraws = true) {
     sfx("button");
-    const n = drawnIds().filter(isOn).length;
-    if (await copyText(shareUrl(true))) toast(n ? `Link copied: pool + ${n} drawn civ${n === 1 ? "" : "s"}` : "Link copied: pool");
+    const n = withDraws ? drawnIds().filter(isOn).length : 0;
+    if (await copyText(shareUrl(withDraws))) toast(n ? `Link copied: civ pool + ${n} drawn civ${n === 1 ? "" : "s"}` : "Link copied: civ pool");
     else openShare();
   }
 
@@ -1584,6 +1603,7 @@ class MersenneTwister {
     autoResetLabel: "Automatically resets the pool of drawn civs when the civilisation pool is changed\nHotkey: T",
     enableAllBtn: "Enables all civilisations so that they are made available in the pool of civilisations for drawing\nHotkey: Space",
     disableAllBtn: "Disables all civilisations so that they are removed from the pool of civilisations for drawing\nHotkey: Enter",
+    poolShareBtn: "Copies a share link with this civ pool",
     edDE: "Selects the Definitive Edition (2019) civilisation pool\nHotkey: Q",
     edHD: "Selects the HD Edition (2013) civilisation pool\nHotkey: W",
     edAOK: "Selects the Age of Kings (1999) civilisation pool\nHotkey: E",
@@ -1659,6 +1679,7 @@ class MersenneTwister {
     const optionsKey = keyLabel("options");
     $("optionsBig").dataset.tip = `Opens options\nHotkey: Q / ${optionsKey}`;
     $("techBtn").dataset.tip = `Opens the tech tree${cur ? " for the " + cur.name : ""}\nHotkey: T (Draw tab only) / ${keyLabel("techtree")}`;
+    $("shareBtn").dataset.tip = `Copies a share link with your civ pool and this round's draws\nHotkey: ${keyLabel("copyLink")}`;
     for (const k of document.querySelectorAll("kbd[data-key]")) setText(k, keyLabel(k.dataset.key));
     if (tipTarget) setText(els.tip, tipTarget.dataset.tip || "");
   }
@@ -1929,6 +1950,8 @@ class MersenneTwister {
     $("drawBtn").addEventListener("click", () => draw());
     $("resetBtn").addEventListener("click", reset);
     $("techBtn").addEventListener("click", openTechTree);
+    $("shareBtn").addEventListener("click", () => copyShareLink(true));
+    $("poolShareBtn").addEventListener("click", () => copyShareLink(false));
     $("clearLogBtn").addEventListener("click", clearLog);
     els.showRemaining.addEventListener("change", () => toggleSetting("showRemaining"));
     for (const b of els.editionButtons) b.addEventListener("click", () => setEdition(b.dataset.pick));
