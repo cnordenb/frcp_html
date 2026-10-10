@@ -174,13 +174,29 @@
   /* Edition rows sit where the desktop app's radio buttons are, with an icon in place of the radio circle. */
   .edition { display: flex; align-items: center; gap: 4px; width: 175px; height: 28px; font: inherit; color: #000; text-align: left; white-space: nowrap; }
   .ed-icon { position: relative; flex: none; width: 28px; height: 28px; }
+  .edition[aria-pressed="true"] { font-weight: 600; }
   #edDE { left: 10px; top: 36px; }
   #edHD { left: 10px; top: 66px; }
   #edAOK { left: 10px; top: 96px; }
-  #editionIcon { left: 190px; top: 30px; width: 128px; height: 93px; }
-  #enabledCount { left: 200px; top: 140px; }
+  /* The banner and count sit 10 px right of the desktop app's spot, so the bold selected edition name clears them. */
+  #editionIcon { left: 200px; top: 30px; width: 128px; height: 93px; }
+  #enabledCount { left: 210px; top: 140px; }
   #autoToggleLabel { left: 10px; top: 180px; height: 20px; }
   .civ { width: 102px; height: 20px; }
+  /* Civ and DLC toggles: the icon stands in for the checkbox, which stays in the label for the keyboard
+     and screen readers. When off, the icon turns grey under the off cross. */
+  :root:not([data-simple]) .icon-chk input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .chk-icon { position: relative; flex: none; }
+  .chk-icon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .chk-off { visibility: hidden; transform: scale(.9); }
+  .icon-chk input:not(:checked) ~ .chk-icon .chk-face { filter: grayscale(1); }
+  .icon-chk input:not(:checked) ~ .chk-icon .chk-off { visibility: visible; }
+  .icon-chk input:focus-visible ~ .chk-icon { outline: 1px dotted #000; outline-offset: 1px; }
+  /* Civ and DLC names are bold when on and struck through when off. The narrower gap after the civ
+     icon keeps the widest bold civ name, Burgundians, clear of the next column. */
+  :root:not([data-simple]) .civ { gap: 2px; }
+  .icon-chk input:checked ~ .chk-name { font-weight: 600; }
+  .icon-chk input:not(:checked) ~ .chk-name { font-style: italic; text-decoration: line-through; text-decoration-thickness: 2px; }
   #enableAllBtn { left: 10px; top: 470px; width: 100px; height: 30px; }
   #disableAllBtn { left: 125px; top: 470px; width: 100px; height: 30px; }
   #autoResetLabel { left: 310px; top: 480px; height: 20px; }
@@ -1425,12 +1441,20 @@ class MersenneTwister {
     const names = CIVS.filter((c) => c.dlc === dlc).map((c) => c.name);
     return `Toggles ${DLCS[dlc].name} civilisation${names.length === 1 ? "" : "s"}\n(${names.join(", ")})\nHotkey: ${DLC_KEYS[slot]}`;
   }
+  // The icon that stands in for a civ or DLC checkbox, with the off cross that shows while it's unchecked
+  function chkIcon(src, size) {
+    if (SIMPLE) return "";
+    const img = (className, src) => h("img", { className, src, alt: "", width: size, height: size, decoding: "async" });
+    return h("span", { className: "chk-icon", style: { width: size + "px", height: size + "px" } },
+      img("chk-face", src), img("chk-off", "images/ui/off.webp"));
+  }
   function buildPoolControls() {
     // Each civ keeps its place in the grid in every edition, as on the desktop app.
     DISPLAY_ORDER.forEach((c, i) => {
       const input = h("input", { type: "checkbox" });
       input.addEventListener("change", () => toggleCiv(c.id));
-      const label = h("label", { className: "chk civ" }, input, c.name);
+      const label = h("label", { className: "chk icon-chk civ" },
+        input, chkIcon(`images/civ/${c.file}.webp`, 18), h("span", { className: "chk-name" }, c.name));
       Object.assign(label.style, { left: GRID_COLS[i % 5] + "px", top: 210 + 20 * Math.floor(i / 5) + "px" });
       $("civGrid").append(label);
       civBoxes[c.id] = { label, input };
@@ -1441,8 +1465,8 @@ class MersenneTwister {
       DLC_TOGGLES[ed].forEach((dlc, i) => {
         const input = h("input", { type: "checkbox" });
         input.addEventListener("change", () => toggleDlc(dlc));
-        const img = SIMPLE ? "" : h("img", { src: `images/dlc/${DLCS[dlc].icon}.webp`, alt: "", width: L.size, height: L.size, decoding: "async" });
-        const label = h("label", { className: "chk", dataset: { tip: dlcTip(dlc, i) } }, img, input, DLCS[dlc].name);
+        const label = h("label", { className: "chk icon-chk", dataset: { tip: dlcTip(dlc, i) } },
+          input, chkIcon(`images/dlc/${DLCS[dlc].icon}.webp`, L.size), h("span", { className: "chk-name" }, DLCS[dlc].name));
         Object.assign(label.style, { left: L.left + "px", top: L.top(i) + "px", height: L.size + "px", gap: L.gap + "px" });
         group.append(label);
         dlcBoxes[dlc] = input;
