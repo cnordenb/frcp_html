@@ -10,8 +10,6 @@
   :root {
     --page: #dfe4ea;
     --page-ink: #2b333d;
-    --page-muted: #56606c;
-    --page-link: #0b5cad;
     --frame: #8d97a3;
     --face: #f0f0f0;
     --line: #d9d9d9;
@@ -22,8 +20,6 @@
     :root {
       --page: #1c2026;
       --page-ink: #dfe4ea;
-      --page-muted: #a3adb9;
-      --page-link: #8fc3ff;
       --frame: #4b5560;
     }
   }
@@ -58,7 +54,8 @@
     background: url("images/ui/background.webp") center / 100% 100% no-repeat;
   }
   :root:not([data-simple]) .client { background: transparent; }
-  .titlebar { margin: 0; height: 30px; display: flex; align-items: center; padding: 0 10px; font: 12px var(--ui); }
+  .titlebar { height: 30px; display: flex; align-items: center; justify-content: space-between; padding-left: 10px; font: 12px var(--ui); }
+  .titlebar h1 { margin: 0; font: inherit; }
 
   .menubar { position: relative; z-index: 20; display: flex; height: 20px; }
   .menu { position: relative; }
@@ -82,6 +79,15 @@
   .menu-list > button:focus-visible, .menu-list > a:focus-visible { background: #91c9f7; outline: none; }
   .menu-list kbd { font: inherit; }
   .menu-list hr { margin: 3px 2px 3px 30px; border: 0; border-top: 1px solid #d7d7d7; }
+  /* Parchment menus: dark brown with light text, and gold with dark text on the hovered item. The open
+     menu's title matches its list, and a hovered title is gold like an item. */
+  :root:not([data-simple]) .menu-title:hover { background: #dccb70; border-color: transparent; }
+  :root:not([data-simple]) .menu.open .menu-title { background: #65523b; border-color: #65523b; color: #f1deae; }
+  :root:not([data-simple]) .menu-list { background: #65523b; border-color: #3d2c1c; }
+  :root:not([data-simple]) .menu-list > button, :root:not([data-simple]) .menu-list > a { color: #f1deae; }
+  :root:not([data-simple]) .menu-list > button:hover, :root:not([data-simple]) .menu-list > a:hover,
+  :root:not([data-simple]) .menu-list > button:focus-visible, :root:not([data-simple]) .menu-list > a:focus-visible { background: #dccb70; color: #000; }
+  :root:not([data-simple]) .menu-list hr { border-top-color: rgba(241, 222, 174, .3); }
 
   .client { position: relative; width: 534px; height: 511px; background: #fff; overflow: hidden; }
   .frame { position: absolute; left: 0; right: 0; top: 21px; bottom: 0; border: 1px solid var(--line); }
@@ -141,6 +147,15 @@
   .chk { position: absolute; display: flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
   .chk input { flex: none; margin: 0; cursor: pointer; }
   .chk img { flex: none; display: block; }
+  /* Parchment checkboxes: wooden box images in place of the system checkbox, pressed while the label is held down. */
+  :root:not([data-simple]) input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none; flex: none; width: 16px; height: 16px; margin: 0; border: 0; border-radius: 0;
+    background: url("images/ui/checkbox_unticked.webp") center / 100% 100% no-repeat;
+  }
+  :root:not([data-simple]) input[type="checkbox"]:checked { background-image: url("images/ui/checkbox_ticked.webp"); }
+  :root:not([data-simple]) label:active > input[type="checkbox"] { background-image: url("images/ui/checkbox_unticked_pressed.webp"); }
+  :root:not([data-simple]) label:active > input[type="checkbox"]:checked { background-image: url("images/ui/checkbox_ticked_pressed.webp"); }
+  :root:not([data-simple]) input[type="checkbox"]:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
   .log {
     position: absolute; margin: 0; padding: 2px 4px; resize: none; border: 1px solid #7a7a7a;
     background: #fff; color: #000; font: 12px/1.35 var(--ui); user-select: text; -webkit-user-select: text;
@@ -154,7 +169,6 @@
   :root:not([data-simple]) .log:focus-visible { border-color: transparent; outline-color: #5a3d22; }
 
   /* Positions in the 534x511 client area, as on the desktop app */
-  #optionsSmall { z-index: 4; left: 499px; top: 0; width: 25px; height: 25px; }
   #optionsBig { left: 60px; top: 54px; width: 83px; height: 72px; overflow: hidden; }
   /* The options art sits in wide transparent margins: scale it so the visible part is about 72 px. */
   #optionsBig img { inset: -14px auto auto -11px; width: 100px; height: 100px; }
@@ -204,17 +218,15 @@
   /* Simple mode (/simple): no images or sounds, so image buttons become text buttons. */
   [data-simple] .imgbtn img, [data-simple] .chk img, [data-simple] #civIcon, [data-simple] #editionIcon,
   [data-simple] #soundGroup { display: none !important; }
-  [data-simple] #optionsBig, [data-simple] #techBtn, [data-simple] #optionsSmall {
+  [data-simple] #optionsBig, [data-simple] #techBtn {
     height: 30px; background: #e1e1e1; border: 1px solid #adadad; font: inherit; color: #000;
   }
-  [data-simple] #optionsBig:hover, [data-simple] #techBtn:hover, [data-simple] #optionsSmall:hover { background: #e5f1fb; border-color: var(--accent); }
-  [data-simple] #optionsBig:active, [data-simple] #techBtn:active, [data-simple] #optionsSmall:active { background: #cce4f7; border-color: #005499; }
+  [data-simple] #optionsBig:hover, [data-simple] #techBtn:hover { background: #e5f1fb; border-color: var(--accent); }
+  [data-simple] #optionsBig:active, [data-simple] #techBtn:active { background: #cce4f7; border-color: #005499; }
   [data-simple] #optionsBig { top: 60px; }
   [data-simple] #optionsBig::after { content: "Options"; }
   [data-simple] #techBtn { left: 374px; top: 406px; width: 80px; }
   [data-simple] #techBtn::after { content: "Tech Tree"; }
-  [data-simple] #optionsSmall { width: 25px; height: 21px; padding: 0; }
-  [data-simple] #optionsSmall::after { content: "⚙"; }
   [data-simple] .ed-icon { width: 13px; height: 13px; margin: 0 4px 0 2px; border: 1px solid #333; border-radius: 50%; background: #fff; }
   [data-simple] .edition[aria-pressed="true"] .ed-icon { background: radial-gradient(#000 0 3px, #fff 3.5px); }
 
@@ -231,29 +243,38 @@
     font: 12px/1.35 var(--ui); white-space: pre-line; pointer-events: none;
   }
 
-  .footer { width: 536px; margin-top: 14px; color: var(--page-muted); text-align: center; line-height: 1.5; }
-  .footer p { margin: 0 0 4px; }
-  .footer a { color: var(--page-link); }
-
   /* Dialogs */
   dialog.win {
     padding: 0; max-width: calc(100vw - 32px); border: 1px solid var(--frame); background: var(--face); color: #000;
     color-scheme: light; font: 12px/1.4 var(--ui); box-shadow: 0 12px 36px rgba(0, 0, 0, .35);
   }
   dialog.win::backdrop { background: rgba(0, 0, 0, .15); }
-  /* Parchment options panel. The padding keeps the content inside the panel's frame, and a drop shadow
-     follows the panel's transparent corners where a box shadow wouldn't. */
-  :root:not([data-simple]) #dlgOptions {
+  /* Parchment panels for the options, hotkeys, about and link dialogs. The padding keeps the content inside the panel's
+     frame, and a drop shadow follows the panel's transparent corners where a box shadow wouldn't. */
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare, #dlgOpen) {
     padding: 13px; border: 0; box-shadow: none; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .35));
-    background: url("images/ui/options_panel.webp") center / 100% 100% no-repeat;
+    background: center / 100% 100% no-repeat;
   }
-  :root:not([data-simple]) #dlgOptions .dlg-title { background: none; }
+  :root:not([data-simple]) #dlgOptions { background-image: url("images/ui/options_panel.webp"); }
+  :root:not([data-simple]) #dlgHotkeys { background-image: url("images/ui/hotkeys_panel.webp"); }
+  :root:not([data-simple]) #dlgAbout { background-image: url("images/ui/about_panel.webp"); }
+  :root:not([data-simple]) #dlgShare { background-image: url("images/ui/share_panel.webp"); }
+  :root:not([data-simple]) #dlgOpen { background-image: url("images/ui/open_link_panel.webp"); }
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare, #dlgOpen) .dlg-title { background: none; }
   :root:not([data-simple]) #dlgOptions .group { border-color: rgba(60, 40, 20, .35); }
-  :root:not([data-simple]) #dlgOptions .hint { color: #3d2c1c; }
+  /* Hint, link and error colours dark enough to read on the panel's tan */
+  :root:not([data-simple]) :is(#dlgOptions, #dlgHotkeys, #dlgAbout, #dlgShare) .hint { color: #3d2c1c; }
+  :root:not([data-simple]) #dlgAbout a { color: #08306a; }
+  :root:not([data-simple]) #dlgOpen .err { color: #680a0a; }
   .dlg-title { display: flex; align-items: center; justify-content: space-between; height: 30px; padding-left: 10px; background: #fff; user-select: none; -webkit-user-select: none; }
   .dlg-title h2 { margin: 0; font: inherit; }
   .dlg-x { width: 46px; height: 30px; border: 0; background: none; font: 13px var(--ui); color: #000; cursor: pointer; }
   .dlg-x:hover { background: #e81123; color: #fff; }
+  /* Parchment close buttons: the wooden x button in place of the ✕ glyph, with no hover change. */
+  :root:not([data-simple]) .dlg-x {
+    color: transparent; cursor: default; background: url("images/ui/xbutton.webp") center / 17px 17px no-repeat;
+  }
+  :root:not([data-simple]) .dlg-x:active { background-image: url("images/ui/xbutton_pressed.webp"); }
   .dlg-body { padding: 12px 14px 4px; }
   .dlg-body p { margin: 0 0 8px; }
   .dlg-buttons { display: flex; justify-content: flex-end; gap: 8px; padding: 8px 14px 14px; }
@@ -262,12 +283,39 @@
   .group { min-width: 0; margin: 0; padding: 4px 10px 10px; border: 1px solid #dcdcdc; }
   .group legend { padding: 0 3px; }
   .row { display: flex; align-items: center; gap: 6px; min-height: 22px; white-space: nowrap; cursor: pointer; }
-  .row input { margin: 0; }
+  .row input { margin: 0; cursor: pointer; }
   .field { display: grid; gap: 4px; width: 420px; margin-bottom: 8px; }
   dialog select, dialog input[type="text"] {
     height: 22px; padding: 0 4px; border: 1px solid #7a7a7a; background: #fff; color: #000; font: inherit;
   }
   dialog select:disabled { color: #8a8a8a; border-color: #c4c4c4; }
+  /* Parchment dropdowns: dark brown like the menus, with the wooden dropdown button as the arrow. */
+  :root:not([data-simple]) dialog select {
+    appearance: none; -webkit-appearance: none; padding: 0 22px 0 4px; border-color: #3d2c1c; border-radius: 0; color: #f1deae; cursor: pointer;
+    background: #65523b url("images/ui/dropdownbutton.webp") right center / 16px 100% no-repeat;
+  }
+  /* Each box fits its longest option, as a system dropdown does, so it keeps its width when the choice changes. */
+  :root:not([data-simple]) dialog select[name="jingleType"] { width: 124px; }
+  :root:not([data-simple]) dialog select[name="hotkeys"] { width: 120px; }
+  :root:not([data-simple]) dialog select:active { background-image: url("images/ui/dropdownbutton_pressed.webp"); }
+  :root:not([data-simple]) dialog select:disabled { opacity: .55; cursor: default; }
+  :root:not([data-simple]) dialog select:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+  :root:not([data-simple]) dialog option { background: #65523b; color: #f1deae; }
+  /* Browsers with customizable selects also get the menus' gold highlight on the hovered option.
+     Elsewhere the open list is brown, but the hovered option keeps the system highlight. */
+  @supports (appearance: base-select) {
+    :root:not([data-simple]) dialog select, :root:not([data-simple]) dialog select::picker(select) { appearance: base-select; }
+    :root:not([data-simple]) dialog select { min-block-size: 0; align-items: center; }
+    :root:not([data-simple]) dialog select:open { background-image: url("images/ui/dropdownbutton_pressed.webp"); }
+    :root:not([data-simple]) dialog select::picker-icon, :root:not([data-simple]) dialog option::checkmark { display: none; }
+    /* The list opens below the box unless it doesn't fit there, as a system dropdown does. */
+    :root:not([data-simple]) dialog select::picker(select) {
+      padding: 2px; border: 1px solid #3d2c1c; border-radius: 0; background: #65523b; box-shadow: 2px 2px 3px rgba(0, 0, 0, .25);
+      position-try-order: normal;
+    }
+    :root:not([data-simple]) dialog option { min-block-size: 0; padding: 3px 6px; cursor: pointer; }
+    :root:not([data-simple]) dialog option:hover, :root:not([data-simple]) dialog option:focus-visible { background: #dccb70; color: #000; outline: none; }
+  }
   dialog input[type="range"] { width: 100%; margin: 2px 0; }
   .hint { color: #555; }
   .err { color: #c42b1c; }
@@ -301,7 +349,7 @@
 
 <main id="app">
   <div class="window">
-    <h1 class="titlebar">Fresh Random Civ Picker</h1>
+    <div class="titlebar"><h1>Fresh Random Civ Picker</h1><button type="button" class="dlg-x" id="closeBtn" aria-label="Close">✕</button></div>
 
     <nav class="menubar" id="menubar" aria-label="Main menu">
       <div class="menu">
@@ -418,19 +466,9 @@
         <label class="chk" id="autoResetLabel" data-on="2"><input type="checkbox" id="autoReset">Auto-reset upon change</label>
       </div>
 
-      <button type="button" class="imgbtn" id="optionsSmall" aria-label="Options">
-        <img src="images/ui/options_small.webp" alt="" width="25" height="25">
-      </button>
       <div id="toast" role="status" aria-live="polite"></div>
     </div>
   </div>
-
-  <footer class="footer">
-    <p>Your civ pool, draw log and settings are saved in this browser only.</p>
-    <p>Age of Empires II © Microsoft Corporation. Fresh Random Civ Picker was created under Microsoft's
-      "<a href="https://www.xbox.com/en-US/developers/rules" target="_blank" rel="noopener">Game Content Usage Rules</a>"
-      using assets from Age of Empires II and Age of Empires II: Definitive Edition, and it is not endorsed by or affiliated with Microsoft.</p>
-  </footer>
 </main>
 
 <div id="tip" role="tooltip" hidden></div>
@@ -488,7 +526,7 @@
     <div class="dlg-title"><h2 id="aboutTitle">About Fresh Random Civ Picker</h2><button type="button" class="dlg-x" data-close aria-label="Close">✕</button></div>
     <div class="dlg-body about">
       <p><strong>Fresh Random Civ Picker</strong>, web version <span id="aboutVersion"></span></p>
-      <p>Created by Carl Nordenbrink, alias <a href="https://linktr.ee/hjoerleif" target="_blank" rel="noopener">Hjörleif</a>.
+      <p>Created by Carl Nordenbrink, alias <a href="https://www.youtube.com/hjoerleif" target="_blank" rel="noopener">Hjörleif</a>.
         Also available as a <a href="https://github.com/cnordenb/Fresh-Random-Civ-Picker_GUI/releases" target="_blank" rel="noopener">desktop app</a>.</p>
       <p>Your civ pool, draw log and settings are saved in this browser only. Share links carry a copy of your pool, and of this round's draws if you choose.</p>
       <p class="hint">Age of Empires II © Microsoft Corporation. Fresh Random Civ Picker was created under Microsoft's
@@ -1557,7 +1595,6 @@ class MersenneTwister {
 
     // Tooltips and hotkey labels that depend on the tab, the civ or the hotkey mode
     const optionsKey = keyLabel("options");
-    $("optionsSmall").dataset.tip = tab === 0 ? `Opens options\nHotkey: Q (Draw tab only) / ${optionsKey}` : `Opens options\nHotkey: ${optionsKey}`;
     $("optionsBig").dataset.tip = `Opens options\nHotkey: Q / ${optionsKey}`;
     $("techBtn").dataset.tip = `Opens the tech tree${cur ? " for the " + cur.name : ""}\nHotkey: T (Draw tab only) / ${keyLabel("techtree")}`;
     for (const k of document.querySelectorAll("kbd[data-key]")) setText(k, keyLabel(k.dataset.key));
@@ -1816,7 +1853,7 @@ class MersenneTwister {
         els.tabs[next].focus();
       });
     });
-    $("optionsSmall").addEventListener("click", openOptions);
+    $("closeBtn").addEventListener("click", () => location.assign("about:blank"));
     $("optionsBig").addEventListener("click", openOptions);
     $("civIcon").addEventListener("click", () => jingle(currentId()));
     $("drawBtn").addEventListener("click", () => draw());
@@ -1991,7 +2028,12 @@ class MersenneTwister {
   $("aboutVersion").textContent = "v" + VERSION;
   buildPoolControls();
   // Load the images first shown on a hover, press, tab switch or dialog up front, so they don't flicker in.
-  if (!SIMPLE) for (const t of ["tab1_hover", "tab2_hover", "button_pressed", "logpanel", "options_panel"]) new Image().src = `images/ui/${t}.webp`;
+  if (!SIMPLE) {
+    const early = ["tab1_hover", "tab2_hover", "button_pressed", "logpanel", "options_panel", "hotkeys_panel", "about_panel", "share_panel",
+      "open_link_panel", "checkbox_unticked", "checkbox_ticked", "checkbox_unticked_pressed", "checkbox_ticked_pressed", "dropdownbutton", "dropdownbutton_pressed",
+      "xbutton", "xbutton_pressed"];
+    for (const t of early) new Image().src = `images/ui/${t}.webp`;
+  }
   bind();
 
   if (settings.newRoundOnVisit) closeRound();
